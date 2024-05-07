@@ -84,3 +84,67 @@ Introduced in [Wei et al. (2022)](https://arxiv.org/abs/2201.11903), chain-of-th
   ![the-paper-snippet](./imgs/2-techniques-4.png)
 
 # Generated Knowledge Prompting
+
+![Generated Knowledge Prompting](./imgs/2-techniques-5.png)
+
+- Proposed by [Liu et al. (2022)](https://arxiv.org/pdf/2110.08387), It consists of generating knowledge from a language model, then providing the knowledge as additional input when answering a question.
+
+  1. using few-shot demonstrations to generate questionrelated knowledge statements from a language model.
+  2. using a second language model to make predictions with each knowledge statement, then selecting the highest-confidence prediction.
+
+- Pros
+
+  1. Not require task-specific supervision for knowledge integration, or access to a structured knowledge base.
+  2. Improve performance of LLMs on commonsense reasoning tasks.
+
+- An Example
+
+  1. Prompt for generating knowledges
+
+     ```text
+     Input: A fish is capable of thinking.
+     Knowledge: Fish are more intelligent than they appear. In many areas, such as memory, their cognitive powers match or exceed those of ’higher’ vertebrates including non-human primates. Fish’s long-term memories help them keep track of complex social relationships.
+     Input: A common effect of smoking lots of cigarettes in one’s lifetime is a higher than normal chance of getting lung cancer.
+     Knowledge: Those who consistently averaged less than one cigarette per day over their lifetime had nine times the risk of dying from lung cancer than never smokers. Among people who smoked between one and 10 cigarettes per day, the risk of dying from lung cancer was nearly 12 times higher than that of never smokers.
+     Input: A rock is the same size as a pebble.
+     Knowledge: A pebble is a clast of rock with a particle size of 4 to 64 millimetres based on the Udden-Wentworth scale of sedimentology. Pebbles are generally considered larger than granules (2 to 4 millimetres diameter) and smaller than cobbles (64 to 256 millimetres diameter).
+     Input: Part of golf is trying to get a higher point total than others.
+     Knowledge:
+     ```
+
+  2. One of the outputs(knowledges)
+
+     ```text
+     The objective of golf is to play a set of holes in the least number of strokes. A round of golf typically consists of 18 holes. Each hole is played once in the round on a standard golf course. Each stroke is counted as one point, and the total number of strokes is used to determine the winner of the game.
+     ```
+
+  3. Prompt using the knowledge
+
+     ```text
+     Question: Part of golf is trying to get a higher point total than others. Yes or No?
+     Knowledge: The objective of golf is to play a set of holes in the least number of strokes. A round of golf typically consists of 18 holes. Each hole is played once in the round on a standard golf course. Each stroke is counted as one point, and the total number of strokes is used to determine the winner of the game.
+     Explain and Answer:
+     ```
+
+  4. Output
+
+     ```text
+     No, the objective of golf is not to get a higher point total than others. Rather, the objective is to play a set of holes in the least number of strokes. The total number of strokes is used to determine the winner of the game, not the total number of points.
+     ```
+
+# Prompt Chaining
+
+## 1. What is Prompt Chaining?
+
+- Prompt Chaining is to break tasks into its subtasks, and make use of an output of each subtask as an input of another subtask, creating a chain of prompt operations.
+- Pros
+  1. Better performance: it is useful to accomplish complex tasks.
+  2. Easy to debug: it helps to boost the transparency of your LLM application, increases controllability, and reliability.
+
+## 2. When to use prompt chaining
+
+## 3. Tips for effective prompt chaining
+
+# Refernences
+
+- [Anthropic - Chain prompts](https://docs.anthropic.com/claude/docs/chain-prompts)
