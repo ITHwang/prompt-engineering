@@ -143,8 +143,151 @@ Introduced in [Wei et al. (2022)](https://arxiv.org/abs/2201.11903), chain-of-th
 
 ## 2. When to use prompt chaining
 
+1. Multi-step tasks: ex) Researching a topic -> outlining an essay -> writing an essay -> formatting an essay
+2. Complex instructions: too many instructions or details is hard to follow consistently.
+3. Verifying outputs: ex) generating a list of items -> feeding the list back to the LLM and asking if it is correct.
+4. Parallel processing: If subtasks are independent each other, it is better to run them in parallel.
+
 ## 3. Tips for effective prompt chaining
+
+1. Keep subtasks simple and clear.
+2. Use XML tags which help structure inputs/outputs and make it easier to extract and pass on to the next subtask.
+
+## 4. Example
+
+### 4.1. Answering questions using a document and quotes
+
+- Step1: Extracting the quotes
+
+  ```text
+  Here is a document, in <document></document> XML tags:
+
+  <document>
+  {{DOCUMENT}}
+  </document>
+
+  Please extract, word-for-word, any quotes relevant to the question {{QUESTION}}.
+  Please enclose the full list of quotes in <quotes></quotes> XML tags.
+  If there are no quotes in this document that seem relevant to this question, please say "I can't find any relevant quotes".
+  ```
+
+- Step2: Answering the question using the output of step1 as QUOTES
+
+  ```text
+  I want you to use a document and relevant quotes from the document to answer a question.
+
+  Here is the document:
+  <document>
+  {{DOCUMENT}}
+  </document>
+
+  Here are direct quotes from the document that are most relevant to the question:
+  <quotes>
+  {{QUOTES}}
+  </quotes>
+
+  Please use these to construct an answer to the question "{{QUESTION}}"
+
+  Ensure that your answer is accurate and doesn't contain any information not directly supported by the quotes.
+  ```
+
+### 4.2. Validating outputs(ex. grammatical errors)
+
+- Step1: Generating a list of errors
+
+  ```text
+  Here is an article:
+  <article>
+  {{ARTICLE}}
+  </article>
+
+  Please identify any grammatical errors in the article. Please only respond with the list of errors, and nothing else. If there are no grammatical errors, say "There are no errors."
+  ```
+
+- Step2: Double checking the list of errors using the output of step1 as ERRORS
+
+  ```text
+  Here is an article:
+  <article>
+  {{ARTICLE}}
+  </article>
+
+  Please identify any grammatical errors in the article that are missing from the following list:
+  <list>
+  {{ERRORS}}
+  </list>
+
+  If there are no errors in the article that are missing from the list, say "There are no additional errors."
+  ```
+
+### 4.3. Parallel processing
+
+- When explaining a concept to readers at three different levels(1st grade, 8th grade, college freshman),
+- Step1: Create an outline(three different levels, one for each level)
+
+  ```text
+  Here is a concept: {{CONCEPT}}
+
+  I want you to write a three sentence outline of an essay about this concept that is appropriate for this level of reader: {{LEVEL}}
+
+  Please only respond with your outline, one sentence per line, in <outline></outline> XML tags. Don't say anything else.
+  ```
+
+- Step2: Create full explanations using the output of step1 as OUTLINE
+
+  ```text
+  Here is an outline:
+  <outline>
+  {{OUTLINE}}
+  </outline>
+
+  Please expand each sentence in the outline into a paragraph.
+  Use each sentence word-for-word as the first sentence in its corresponding paragraph.
+  Make sure to write at a level appropriate for this type of reader: {{LEVEL}}.
+  ```
+
+# Tree of Thoughts (ToT)
+
+## 1. What is Tree of Thoughts?
+
+- [Yao et el. (2023)](https://arxiv.org/abs/2305.10601) and [Long (2023)](https://arxiv.org/abs/2305.08291) recently proposed Tree of Thoughts (ToT): CoT prompting + exploration over intermediate thoughts.
+
+![Tree of Thoughts](./imgs/2-techniques-6.png)
+
+- An LLM self-evaluates a reasoning progress through intermediate thoughts, which helps to solve a problem through a deliberate reasoning process.
+- The LLM's ability to generate and evaluate thoughts is then combined with search algorithms(BFS, DFS. Beam search, etc.) to explore the possible reasoning paths.
+
+## 2. How does it work?
+
+![Tree of Thoughts Example](./imgs/2-techniques-7.png)
+
+- [Yao et el. (2023)](https://arxiv.org/abs/2305.10601) applies BFS and ToT to the Game of 24 task, generating 3 steps(layers) and 5 candidates per thoughts(nodes).
+- The LLM is prompted to evaluate each thought candidate as "sure/maybe/impossible" with regard to reaching 24, the aim of which is to promote correct partial solutions.
+
+## 3. Variations of ToT
+
+1. RL-based ToT system: [Long (2023)](https://arxiv.org/abs/2305.08291) uses a "ToT Controller" trained from new dataset through reinforcement learning even with a fixed LLM.
+2. ToT only with a single prompt: [Hulbert (2023)](https://github.com/dave1010/tree-of-thought-prompting) implements the main concept of ToT with only one prompt. It boosts the ChatGPT 3.5's reasoning to ChatGPT 4.0's in some cases.
+   - Prompt
+     ```text
+     Imagine three different experts are answering this question.
+     All experts will write down 1 step of their thinking,
+     then share it with the group.
+     Then all experts will go on to the next step, etc.
+     If any expert realises they're wrong at any point then they leave.
+     The question is...
+     ```
+3. PanelGPT: [Sun (2023)](https://github.com/holarissun/PanelGPT) benchmarked the Tree-of-Thought Prompting with an idea of panel discussions among LLMs.
+
+# Retrieval Augmented Generation (RAG)
+
+- [Retrieval-Augmented Generation for Large Language Models: A Survey](https://arxiv.org/abs/2312.10997)
+
+# Automatic Reasoning and Tool-use (ART)
+
+...
 
 # Refernences
 
 - [Anthropic - Chain prompts](https://docs.anthropic.com/claude/docs/chain-prompts)
+- [Official Repo of Tree of Thoughts (ToT)](https://github.com/princeton-nlp/tree-of-thought-llm)
