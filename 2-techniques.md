@@ -285,6 +285,19 @@ Introduced in [Wei et al. (2022)](https://arxiv.org/abs/2201.11903), chain-of-th
 
 # Automatic Reasoning and Tool-use (ART)
 
+- Prob: Combining CoT prompting and tools in an interleaved manner suffers from hand-crafting task-specific demonstrations and carefully scripted interleaving of model generations with tool use.
+- [Paranjape et al. (2023)](https://arxiv.org/abs/2303.09014) proposed ART:
+  1. Given a new task, it select demonstrations of multi-step reasoning and tool use from a task library
+  2. At test time, it pauses generation whenever external tools are called, and integrate their output before resuming generation
+
+![ART](./imgs/2-techniques-8.png)
+
+- Pros
+  1. Model can generalize from demonstrations to decompose a new task and use tools in appropriate places.
+  2. ART enables humans to fix mistakes in the reasoning steps or add new tools.
+
+# Automatic Prompt Engineer (APE)
+
 ...
 
 # Refernences
